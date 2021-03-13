@@ -1,54 +1,56 @@
-#include <stdlib.h>
-#include <stdarg.h>
-
 #include "processing.h"
 #include "model_cdio.h"
-#include "model.h"
 #include "transform.h"
 
-model_t& process(const action_t action, ...)
-{
-    static model_t model = {0};
-    va_list args;
-    va_start(args, action);
+/*
+ *
+ * Распределение функций по модулям
+ * Уровни абстракции отследить
+ * Не больше трех переменных
+ * Названия файлов и функций
+ * Обработка ошибок в интерфейсе ----------
+ * Строки в интерфейсе (память)  ----------
+ * Заголовочные файлы (интерфейс или реализация)
+ * Расположение in out var в списке параметров
+ * Модификаторы const и ссылки проверить
+ *
+*/
 
-    switch (action)
+model_t &process(const args_t &args)
+{
+    static model_t model = init_model();
+
+    switch (args.action)
     {
         case EXIT: {
-            delete_model(model);
+            model.error = delete_model(model);
             break;
         }
-
         case LOAD: {
-            const char *openname = va_arg(args, const char *);
-            int rc = read_model(openname, model);
-            if (rc)
-                model.points = NULL;
+            model.error = read_model(args.name, model);
             break;
         }
         case SAVE: {
-            const char *savename = va_arg(args, const char *);
-            write_model(savename, model);
+            model.error = write_model(args.name, model);
             break;
         }
-        case MOVE:
-        case SCALE:
+        case MOVE: {
+            model.error = move(model, args.x, args.y, args.z);
+            break;
+        }
+        case SCALE: {
+            model.error = scale(model, args.x, args.y, args.z);
+            break;
+        }
         case ROTATE: {
-            double x = va_arg(args, double);
-            double y = va_arg(args, double);
-            double z = va_arg(args, double);
-            if (action == MOVE)
-                move(model, x, y, z);
-            else if (action == SCALE)
-                scale(model, x, y, z);
-            else
-                rotate(model, x, y, z);
+            model.error = rotate(model, args.x, args.y, args.z);
             break;
         }
-        default:
+        default: {
+            model.error = INVALID_FUNC;
             break;
+        }
     }
 
-    va_end(args);
     return model;
 }

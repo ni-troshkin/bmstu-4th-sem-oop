@@ -34,8 +34,11 @@ MainWindow::~MainWindow()
 void MainWindow::on_load_btn_clicked()
 {
     const char *filename = ui->entry_load->text().toLocal8Bit().data();
-    model_t model = process(LOAD, filename);
-    if (model.points == NULL)
+    args_t args;
+    args.action = LOAD;
+    args.name = filename;
+    model_t model = process(args);
+    if (model.error)
         QMessageBox::warning(this, "Error", "File not found");
     else
         MainWindow::draw(model);
@@ -56,12 +59,12 @@ void MainWindow::draw(model_t &model)
 void MainWindow::on_save_btn_clicked()
 {
     const char *filename = ui->entry_save->text().toLocal8Bit().data();
-    process(SAVE, filename);
-    FILE *f = fopen(filename, "r");
-    if (!f)
+    args_t args;
+    args.name = filename;
+    args.action = SAVE;
+    model_t model = process(args);
+    if (model.error)
         QMessageBox::warning(this, "Error", "Incorrect name of file");
-    else
-        fclose(f);
 }
 
 void MainWindow::transform(action_t action)
@@ -107,10 +110,16 @@ void MainWindow::transform(action_t action)
         QMessageBox::warning(this, "Error", "Invalid value");
     else
     {
-        model_t model = process(action, x, y, z);
-        if (!model.points)
+        args_t args;
+        args.action = action;
+        args.x = x;
+        args.y = y;
+        args.z = z;
+        model_t model = process(args);
+        if (model.error)
             QMessageBox::warning(this, "Error", "Model was not uploaded");
-        MainWindow::draw(model);
+        else
+            MainWindow::draw(model);
     }
 }
 
@@ -141,10 +150,8 @@ void MainWindow::on_info_btn_clicked()
 
 void MainWindow::on_exit_btn_clicked()
 {
+    args_t args;
+    args.action = EXIT;
+    process(args);
     exit(0);
-}
-
-void MainWindow::on_MainWindow_destroyed()
-{
-    process(EXIT);
 }

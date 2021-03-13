@@ -20,14 +20,20 @@ SOURCES += \
     interface.cpp \
     model_cdio.cpp \
     processing.cpp \
-    transform.cpp
+    reader.cpp \
+    rotation.cpp \
+    transform.cpp \
+    writer.cpp
 
 HEADERS += \
     interface.h \
     model.h \
     model_cdio.h \
     processing.h \
-    transform.h
+    reader.h \
+    rotation.h \
+    transform.h \
+    writer.h
 
 FORMS += \
     interface.ui

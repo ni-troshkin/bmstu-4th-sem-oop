@@ -1,127 +1,86 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "reader.h"
+#include "writer.h"
 #include "model_cdio.h"
-#include "model.h"
 
-void delete_model(model_t &model)
+static err_t zero_members(model_t &model);
+static err_t free_model(model_t &model);
+
+
+model_t init_model(void)
 {
-    if (model.points)
-    {
-        free(model.points);
-        model.points = NULL;
-    }
+    model_t model;
 
-    if (model.links)
-    {
-        free(model.links);
-        model.links = NULL;
-    }
+    zero_members(model);
 
-    model.links_count = model.points_count = 0;
-    model.center.x = model.center.y = model.center.z = 0;
+    return model;
 }
 
-static int read_points(FILE *file, model_t &model)
+err_t delete_model(model_t &model)
 {
-    fscanf(file, "%zu", &model.points_count);
-
-    model.points = (point_t *)malloc(model.points_count * sizeof(point_t));
-    if (!model.points)
-        return ALLOC_ERR;
-
-    for (size_t i = 0; i < model.points_count; i++)
-    {
-        fscanf(file, "%lf", &(model.points[i].x));
-        fscanf(file, "%lf", &(model.points[i].y));
-        fscanf(file, "%lf", &(model.points[i].z));
-    }
+    free_model(model);
 
     return OK;
 }
 
-static int read_links(FILE *file, model_t &model)
+err_t read_model(const char *filename, model_t &model)
 {
-    fscanf(file, "%zu", &model.links_count);
+    if (!filename)
+        return NULL_PTR_ERR;
 
-    model.links = (link_t *)malloc(model.links_count * sizeof(link_t));
-    if (!model.links)
-        return ALLOC_ERR;
-
-    for (size_t i = 0; i < model.links_count; i++)
-    {
-        fscanf(file, "%zu", &(model.links[i].from));
-        fscanf(file, "%zu", &(model.links[i].to));
-    }
-
-    return OK;
-}
-
-static void read_center(FILE *file, model_t &model)
-{
-    fscanf(file, "%lf", &model.center.x);
-    fscanf(file, "%lf", &model.center.y);
-    fscanf(file, "%lf", &model.center.z);
-}
-
-int read_model(const char *filename, model_t &model)
-{
     FILE *file = fopen(filename, "r");
     if (!file)
         return FILE_NOT_FOUND;
 
-    if (model.links || model.points)
-        delete_model(model);
+    free_model(model);
+    zero_members(model);
 
-    int rc = read_points(file, model);
-    if (rc)
-        return rc;
+    err_t err = scan_model(file, model);
 
-    rc = read_links(file, model);
-    if (rc)
+    if (err)
     {
-        free(model.points);
-        return rc;
+        free_model(model);
+        zero_members(model);
     }
 
-    read_center(file, model);
+    fclose(file);
+
+    return err;
+}
+
+err_t write_model(const char *filename, model_t &model)
+{
+    if (!filename)
+        return NULL_PTR_ERR;
+
+    FILE *file = fopen(filename, "w");
+    if (!file)
+        return INVALID_FILENAME;
+
+    err_t err = output_model(file, model);
 
     fclose(file);
+    return err;
+}
+
+
+
+static err_t zero_members(model_t &model)
+{
+    model.links = nullptr;
+    model.points = nullptr;
+    model.center.x = model.center.y = model.center.z = 0.0;
+    model.links_count = model.points_count = 0;
+    model.error = OK;
+
     return OK;
 }
 
-static void write_points(FILE *file, model_t &model)
+static err_t free_model(model_t &model)
 {
-    fprintf(file, "%zu\n", model.points_count);
-    for (size_t i = 0; i < model.points_count; i++)
-        fprintf(file, "%.2lf %.2lf %.2lf\n",
-            model.points[i].x, model.points[i].y, model.points[i].z);
-}
-
-static void write_links(FILE *file, model_t &model)
-{
-    fprintf(file, "%zu\n", model.links_count);
-    for (size_t i = 0; i < model.links_count; i++)
-        fprintf(file, "%zu %zu\n",
-            model.links[i].from, model.links[i].to);
-}
-
-static void write_center(FILE *file, model_t &model)
-{
-    fprintf(file, "%.2lf %.2lf %.2lf", \
-            model.center.x, model.center.y, model.center.z);
-}
-
-void write_model(const char *filename, model_t &model)
-{
-    FILE *file = fopen(filename, "w");
-
-    if (!file)
-        return;
-
-    write_points(file, model);
-    write_links(file, model);
-    write_center(file, model);
-
-    fclose(file);
+    free(model.points);
+    free(model.links);
+    return OK;
 }

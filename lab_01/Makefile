@@ -56,11 +56,13 @@ SOURCES       = ../lab_01/main.cpp \
 		../lab_01/interface.cpp \
 		../lab_01/model_cdio.cpp \
 		../lab_01/processing.cpp \
+		../lab_01/rotation.cpp \
 		../lab_01/transform.cpp moc_interface.cpp
 OBJECTS       = main.o \
 		interface.o \
 		model_cdio.o \
 		processing.o \
+		rotation.o \
 		transform.o \
 		moc_interface.o
 DIST          = hex_pyramid.txt \
@@ -147,10 +149,12 @@ DIST          = hex_pyramid.txt \
 		../lab_01/model.h \
 		../lab_01/model_cdio.h \
 		../lab_01/processing.h \
+		../lab_01/rotation.h \
 		../lab_01/transform.h ../lab_01/main.cpp \
 		../lab_01/interface.cpp \
 		../lab_01/model_cdio.cpp \
 		../lab_01/processing.cpp \
+		../lab_01/rotation.cpp \
 		../lab_01/transform.cpp
 QMAKE_TARGET  = lab_01
 DESTDIR       = 
@@ -333,8 +337,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../lab_01/interface.h ../lab_01/model.h ../lab_01/model_cdio.h ../lab_01/processing.h ../lab_01/transform.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../lab_01/main.cpp ../lab_01/interface.cpp ../lab_01/model_cdio.cpp ../lab_01/processing.cpp ../lab_01/transform.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../lab_01/interface.h ../lab_01/model.h ../lab_01/model_cdio.h ../lab_01/processing.h ../lab_01/rotation.h ../lab_01/transform.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../lab_01/main.cpp ../lab_01/interface.cpp ../lab_01/model_cdio.cpp ../lab_01/processing.cpp ../lab_01/rotation.cpp ../lab_01/transform.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../lab_01/interface.ui $(DISTDIR)/
 	$(COPY_FILE) --parents lab_01_ru_RU.ts $(DISTDIR)/
 
@@ -420,8 +424,13 @@ processing.o: ../lab_01/processing.cpp ../lab_01/processing.h \
 		../lab_01/transform.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o processing.o ../lab_01/processing.cpp
 
-transform.o: ../lab_01/transform.cpp ../lab_01/transform.h \
+rotation.o: ../lab_01/rotation.cpp ../lab_01/rotation.h \
 		../lab_01/model.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o rotation.o ../lab_01/rotation.cpp
+
+transform.o: ../lab_01/transform.cpp ../lab_01/transform.h \
+		../lab_01/model.h \
+		../lab_01/rotation.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o transform.o ../lab_01/transform.cpp
 
 moc_interface.o: moc_interface.cpp 

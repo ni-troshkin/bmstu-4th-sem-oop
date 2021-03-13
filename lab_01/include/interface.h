@@ -33,8 +33,6 @@ private slots:
 
     void on_rotate_btn_clicked();
 
-    void on_MainWindow_destroyed();
-
     void on_info_btn_clicked();
 
 private:

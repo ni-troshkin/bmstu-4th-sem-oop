@@ -13,6 +13,13 @@ typedef enum
     ROTATE
 } action_t;
 
-model_t &process(action_t action, ...);
+typedef struct
+{
+    action_t action;
+    double x, y, z;
+    const char *name;
+} args_t;
+
+model_t &process(const args_t &args);
 
 #endif // PROCESSING_H
