@@ -52,18 +52,30 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = ../lab_01/main.cpp \
+SOURCES       = ../lab_01/cleaner.cpp \
+		../lab_01/linkio.cpp \
+		../lab_01/main.cpp \
 		../lab_01/interface.cpp \
 		../lab_01/model_cdio.cpp \
+		../lab_01/movescale.cpp \
+		../lab_01/pointio.cpp \
 		../lab_01/processing.cpp \
+		../lab_01/reader.cpp \
 		../lab_01/rotation.cpp \
-		../lab_01/transform.cpp moc_interface.cpp
-OBJECTS       = main.o \
+		../lab_01/transform.cpp \
+		../lab_01/writer.cpp moc_interface.cpp
+OBJECTS       = cleaner.o \
+		linkio.o \
+		main.o \
 		interface.o \
 		model_cdio.o \
+		movescale.o \
+		pointio.o \
 		processing.o \
+		reader.o \
 		rotation.o \
 		transform.o \
+		writer.o \
 		moc_interface.o
 DIST          = hex_pyramid.txt \
 		prism.txt \
@@ -145,17 +157,30 @@ DIST          = hex_pyramid.txt \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exceptions.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/yacc.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
-		../lab_01/lab_01.pro ../lab_01/interface.h \
+		../lab_01/lab_01.pro ../lab_01/args.h \
+		../lab_01/cleaner.h \
+		../lab_01/interface.h \
+		../lab_01/linkio.h \
 		../lab_01/model.h \
 		../lab_01/model_cdio.h \
+		../lab_01/movescale.h \
+		../lab_01/pointio.h \
 		../lab_01/processing.h \
+		../lab_01/reader.h \
 		../lab_01/rotation.h \
-		../lab_01/transform.h ../lab_01/main.cpp \
+		../lab_01/transform.h \
+		../lab_01/writer.h ../lab_01/cleaner.cpp \
+		../lab_01/linkio.cpp \
+		../lab_01/main.cpp \
 		../lab_01/interface.cpp \
 		../lab_01/model_cdio.cpp \
+		../lab_01/movescale.cpp \
+		../lab_01/pointio.cpp \
 		../lab_01/processing.cpp \
+		../lab_01/reader.cpp \
 		../lab_01/rotation.cpp \
-		../lab_01/transform.cpp
+		../lab_01/transform.cpp \
+		../lab_01/writer.cpp
 QMAKE_TARGET  = lab_01
 DESTDIR       = 
 TARGET        = lab_01
@@ -337,8 +362,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../lab_01/interface.h ../lab_01/model.h ../lab_01/model_cdio.h ../lab_01/processing.h ../lab_01/rotation.h ../lab_01/transform.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../lab_01/main.cpp ../lab_01/interface.cpp ../lab_01/model_cdio.cpp ../lab_01/processing.cpp ../lab_01/rotation.cpp ../lab_01/transform.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../lab_01/args.h ../lab_01/cleaner.h ../lab_01/interface.h ../lab_01/linkio.h ../lab_01/model.h ../lab_01/model_cdio.h ../lab_01/movescale.h ../lab_01/pointio.h ../lab_01/processing.h ../lab_01/reader.h ../lab_01/rotation.h ../lab_01/transform.h ../lab_01/writer.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../lab_01/cleaner.cpp ../lab_01/linkio.cpp ../lab_01/main.cpp ../lab_01/interface.cpp ../lab_01/model_cdio.cpp ../lab_01/movescale.cpp ../lab_01/pointio.cpp ../lab_01/processing.cpp ../lab_01/reader.cpp ../lab_01/rotation.cpp ../lab_01/transform.cpp ../lab_01/writer.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../lab_01/interface.ui $(DISTDIR)/
 	$(COPY_FILE) --parents lab_01_ru_RU.ts $(DISTDIR)/
 
@@ -378,6 +403,7 @@ compiler_moc_header_clean:
 moc_interface.cpp: ../lab_01/interface.h \
 		../lab_01/processing.h \
 		../lab_01/model.h \
+		../lab_01/args.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nicktrs/qt/build-lab_01-Desktop-Debug/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nicktrs/qt/lab_01 -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../lab_01/interface.h -o moc_interface.cpp
@@ -403,35 +429,72 @@ compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean compiler_ui
 
 ####### Compile
 
+cleaner.o: ../lab_01/cleaner.cpp ../lab_01/cleaner.h \
+		../lab_01/model.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o cleaner.o ../lab_01/cleaner.cpp
+
+linkio.o: ../lab_01/linkio.cpp ../lab_01/linkio.h \
+		../lab_01/model.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o linkio.o ../lab_01/linkio.cpp
+
 main.o: ../lab_01/main.cpp ../lab_01/interface.h \
 		../lab_01/processing.h \
-		../lab_01/model.h
+		../lab_01/model.h \
+		../lab_01/args.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../lab_01/main.cpp
 
 interface.o: ../lab_01/interface.cpp ../lab_01/interface.h \
 		../lab_01/processing.h \
 		../lab_01/model.h \
+		../lab_01/args.h \
 		ui_interface.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o interface.o ../lab_01/interface.cpp
 
-model_cdio.o: ../lab_01/model_cdio.cpp ../lab_01/model_cdio.h \
-		../lab_01/model.h
+model_cdio.o: ../lab_01/model_cdio.cpp ../lab_01/reader.h \
+		../lab_01/model.h \
+		../lab_01/writer.h \
+		../lab_01/cleaner.h \
+		../lab_01/model_cdio.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o model_cdio.o ../lab_01/model_cdio.cpp
+
+movescale.o: ../lab_01/movescale.cpp ../lab_01/movescale.h \
+		../lab_01/args.h \
+		../lab_01/model.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o movescale.o ../lab_01/movescale.cpp
+
+pointio.o: ../lab_01/pointio.cpp ../lab_01/pointio.h \
+		../lab_01/model.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o pointio.o ../lab_01/pointio.cpp
 
 processing.o: ../lab_01/processing.cpp ../lab_01/processing.h \
 		../lab_01/model.h \
+		../lab_01/args.h \
 		../lab_01/model_cdio.h \
 		../lab_01/transform.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o processing.o ../lab_01/processing.cpp
 
+reader.o: ../lab_01/reader.cpp ../lab_01/reader.h \
+		../lab_01/model.h \
+		../lab_01/pointio.h \
+		../lab_01/linkio.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o reader.o ../lab_01/reader.cpp
+
 rotation.o: ../lab_01/rotation.cpp ../lab_01/rotation.h \
-		../lab_01/model.h
+		../lab_01/model.h \
+		../lab_01/args.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o rotation.o ../lab_01/rotation.cpp
 
 transform.o: ../lab_01/transform.cpp ../lab_01/transform.h \
 		../lab_01/model.h \
+		../lab_01/args.h \
 		../lab_01/rotation.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o transform.o ../lab_01/transform.cpp
+
+writer.o: ../lab_01/writer.cpp ../lab_01/writer.h \
+		../lab_01/model.h \
+		../lab_01/pointio.h \
+		../lab_01/linkio.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o writer.o ../lab_01/writer.cpp
 
 moc_interface.o: moc_interface.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_interface.o moc_interface.cpp

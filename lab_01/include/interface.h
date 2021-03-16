@@ -23,6 +23,8 @@ private slots:
 
     void on_load_btn_clicked();
 
+    void err_handler(err_t error);
+
     void draw(model_t &model);
 
     void transform(action_t action);

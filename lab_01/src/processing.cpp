@@ -2,20 +2,6 @@
 #include "model_cdio.h"
 #include "transform.h"
 
-/*
- *
- * Распределение функций по модулям
- * Уровни абстракции отследить
- * Не больше трех переменных
- * Названия файлов и функций
- * Обработка ошибок в интерфейсе ----------
- * Строки в интерфейсе (память)  ----------
- * Заголовочные файлы (интерфейс или реализация)
- * Расположение in out var в списке параметров
- * Модификаторы const и ссылки проверить
- *
-*/
-
 model_t &process(const args_t &args)
 {
     static model_t model = init_model();
@@ -35,15 +21,15 @@ model_t &process(const args_t &args)
             break;
         }
         case MOVE: {
-            model.error = move(model, args.x, args.y, args.z);
+            model.error = move(model, args.tr_args);
             break;
         }
         case SCALE: {
-            model.error = scale(model, args.x, args.y, args.z);
+            model.error = scale(model, args.tr_args);
             break;
         }
         case ROTATE: {
-            model.error = rotate(model, args.x, args.y, args.z);
+            model.error = rotate(model, args.tr_args);
             break;
         }
         default: {

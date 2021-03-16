@@ -5,6 +5,9 @@
 #include <stdlib.h>
 #include "model.h"
 
-err_t scan_model(FILE *file, model_t &model);
+//#include "pointio.h"
+//#include "linkio.h"
+
+err_t reader(model_t &model, FILE *file);
 
 #endif // READER_H

@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include "model.h"
 
-err_t output_model(FILE *file, model_t &model);
+//#include "pointio.h"
+//#include "linkio.h"
+
+err_t writer(FILE *file, const model_t &model);
 
 #endif // WRITER_H

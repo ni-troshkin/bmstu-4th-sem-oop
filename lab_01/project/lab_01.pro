@@ -16,9 +16,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    cleaner.cpp \
+    linkio.cpp \
     main.cpp \
     interface.cpp \
     model_cdio.cpp \
+    movescale.cpp \
+    pointio.cpp \
     processing.cpp \
     reader.cpp \
     rotation.cpp \
@@ -26,9 +30,14 @@ SOURCES += \
     writer.cpp
 
 HEADERS += \
+    args.h \
+    cleaner.h \
     interface.h \
+    linkio.h \
     model.h \
     model_cdio.h \
+    movescale.h \
+    pointio.h \
     processing.h \
     reader.h \
     rotation.h \

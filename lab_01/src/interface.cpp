@@ -6,6 +6,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "interface.h"
 #include "ui_interface.h"
@@ -31,17 +32,57 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::err_handler(err_t error)
+{
+    switch (error)
+    {
+        case OK: break;
+        case FILE_NOT_FOUND:
+            QMessageBox::warning(this, "Ошибка", "Файл не найден"); break;
+        case INVALID_FILENAME:
+            QMessageBox::warning(this, "Ошибка", "Некорректное имя файла"); break;
+        case ALLOC_ERR:
+            QMessageBox::warning(this, "Ошибка", "Ошибка выделения памяти"); break;
+        case NULL_PTR_ERR:
+            QMessageBox::warning(this, "Ошибка", "Ошибка в программе"); break;
+        case READ_ERR:
+            QMessageBox::warning(this, "Ошибка", "Файл поврежден, неверные данные"); break;
+        case SELF_LINK:
+            QMessageBox::warning(this, "Ошибка", "Неверные данные: отрезок выродился в точку"); break;
+        case POINT_NOT_EXIST:
+            QMessageBox::warning(this, "Ошибка", "Неверные данные: ребро в несуществующей точке"); break;
+        case INVALID_FUNC:
+            QMessageBox::warning(this, "Ошибка", "Ошибка в программе"); break;
+        case EMPTY_MODEL:
+            QMessageBox::warning(this, "Ошибка", "Модель не загружена"); break;
+        case ZERO_SCALE:
+            QMessageBox::warning(this, "Ошибка", "Нулевое масштабирование запрещено"); break;
+    }
+}
+
 void MainWindow::on_load_btn_clicked()
 {
-    const char *filename = ui->entry_load->text().toLocal8Bit().data();
-    args_t args;
-    args.action = LOAD;
-    args.name = filename;
-    model_t model = process(args);
-    if (model.error)
-        QMessageBox::warning(this, "Error", "File not found");
-    else
-        MainWindow::draw(model);
+    QByteArray tmp = ui->entry_load->text().toLocal8Bit();
+    const char *filename = strdup(tmp.data());
+    QMessageBox msgBox;
+    msgBox.setWindowTitle("Сохранение файла");
+    msgBox.setIcon(QMessageBox::Question);
+    msgBox.setText("На данный момент у вас загружена другая модель."
+                   "Очистить ее, если она не сохранена?");
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    int ret = msgBox.exec();
+    if (ret == QMessageBox::Yes)
+    {
+        args_t args;
+        args.action = LOAD;
+        args.name = filename;
+        model_t model = process(args);
+        if (model.error)
+            err_handler(model.error);
+        else
+            MainWindow::draw(model);
+    }
+    free((void *)filename);
 }
 
 void MainWindow::draw(model_t &model)
@@ -58,13 +99,14 @@ void MainWindow::draw(model_t &model)
 
 void MainWindow::on_save_btn_clicked()
 {
-    const char *filename = ui->entry_save->text().toLocal8Bit().data();
+    QByteArray tmp = ui->entry_save->text().toLocal8Bit();
+    const char *filename = strdup(tmp.data());
     args_t args;
     args.name = filename;
     args.action = SAVE;
     model_t model = process(args);
-    if (model.error)
-        QMessageBox::warning(this, "Error", "Incorrect name of file");
+    err_handler(model.error);
+    free((void *)filename);
 }
 
 void MainWindow::transform(action_t action)
@@ -93,15 +135,18 @@ void MainWindow::transform(action_t action)
         ez = ui->entry_thz;
     }
 
-    const char *csx = ex->text().toLocal8Bit().data();
+    QByteArray tmp = ex->text().toLocal8Bit();
+    const char *csx = strdup(tmp.data());
     x = strtod(csx, &end);
     if (*end)
         error = true;
-    const char *csy = ey->text().toLocal8Bit().data();
+    tmp = ey->text().toLocal8Bit();
+    const char *csy = strdup(tmp.data());
     y = strtod(csy, &end);
     if (*end)
         error = true;
-    const char *csz = ez->text().toLocal8Bit().data();
+    tmp = ez->text().toLocal8Bit();
+    const char *csz = strdup(tmp.data());
     z = strtod(csz, &end);
     if (*end)
         error = true;
@@ -112,15 +157,19 @@ void MainWindow::transform(action_t action)
     {
         args_t args;
         args.action = action;
-        args.x = x;
-        args.y = y;
-        args.z = z;
+        args.tr_args.x = x;
+        args.tr_args.y = y;
+        args.tr_args.z = z;
         model_t model = process(args);
         if (model.error)
-            QMessageBox::warning(this, "Error", "Model was not uploaded");
+            err_handler(model.error);
         else
             MainWindow::draw(model);
     }
+
+    free((void *)csx);
+    free((void *)csy);
+    free((void *)csz);
 }
 
 void MainWindow::on_move_btn_clicked()

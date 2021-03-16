@@ -3,20 +3,20 @@
 
 #include <stdlib.h>
 
-typedef struct
+struct point_t
 {
     double x;
     double y;
     double z;
-} point_t;
+};
 
-typedef struct
+struct link_t
 {
     size_t from;
     size_t to;
-} link_t;
+};
 
-typedef enum
+enum err_t
 {
     OK,
     FILE_NOT_FOUND,
@@ -29,9 +29,9 @@ typedef enum
     INVALID_FUNC,
     EMPTY_MODEL,
     ZERO_SCALE
-} err_t;
+};
 
-typedef struct
+struct model_t
 {
     point_t *points;
     size_t points_count;
@@ -41,6 +41,6 @@ typedef struct
 
     point_t center;
     err_t error;
-} model_t;
+};
 
 #endif // MODEL_H
